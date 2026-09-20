@@ -22,11 +22,25 @@ spring:
 server:
   port: 8080
 
+jwt:
+  secret: ${JWT_SECRET:my-super-secret-key-for-local-dev-min-32-bytes!}
+  expiration: 86400000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: taskmanager
+
 logging:
   level:
     root: INFO
     com.javarush.lipin.taskmanager: DEBUG
-
-jwt:
-  secret: ${JWT_SECRET:my-super-secret-key-for-local-dev-min-32-bytes!}
-  expiration: 86400000
+  file:
+    name: logs/taskmanager.log

@@ -103,6 +103,13 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- Экспорт метрик в формате Prometheus -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
         <!-- Swagger / OpenAPI -->
         <dependency>
             <groupId>org.springdoc</groupId>

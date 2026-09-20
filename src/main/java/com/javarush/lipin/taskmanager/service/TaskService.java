@@ -9,6 +9,8 @@ import com.javarush.lipin.taskmanager.model.entity.Task;
 import com.javarush.lipin.taskmanager.model.entity.TaskStatus;
 import com.javarush.lipin.taskmanager.model.entity.User;
 import com.javarush.lipin.taskmanager.model.repository.TaskRepository;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,8 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
+    private final TaskMetrics taskMetrics;
+    private final MeterRegistry meterRegistry;
 
     @Transactional(readOnly = true)
     public List<TaskResponse> getAllForUser(User currentUser, TaskStatus statusFilter) {
@@ -44,6 +48,7 @@ public class TaskService {
 
     @Transactional
     public TaskResponse create(TaskCreateRequest request, User currentUser) {
+        Timer.Sample sample = taskMetrics.startTimer(meterRegistry);
         log.info("User id={} creates task '{}'", currentUser.getId(), request.title());
 
         Task task = new Task();
@@ -53,6 +58,9 @@ public class TaskService {
         task.setOwner(currentUser);
 
         Task saved = taskRepository.save(task);
+        taskMetrics.onTaskCreated();
+        taskMetrics.stopTimer(sample);
+
         log.info("Task id={} created for user id={}", saved.getId(), currentUser.getId());
         return taskMapper.toResponse(saved);
     }

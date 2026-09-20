@@ -1,0 +1,204 @@
+{
+  "info": {
+    "name": "TaskManager API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      { "key": "token", "value": "{{token}}", "type": "string" }
+    ]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/auth/register", "host": [ "{{baseUrl}}" ], "path": [ "api", "auth", "register" ] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"lipin\",\n  \"email\": \"lipin@test.com\",\n  \"password\": \"secret123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login (saves token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    pm.collectionVariables.set('token', pm.response.json().token);",
+                  "    console.log('Token saved');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": [ "{{baseUrl}}" ], "path": [ "api", "auth", "login" ] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"lipin\",\n  \"password\": \"secret123\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "item": [
+        {
+          "name": "Create task",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/tasks", "host": [ "{{baseUrl}}" ], "path": [ "api", "tasks" ] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Сдать финальный проект\",\n  \"description\": \"Дедлайн 21.09\",\n  \"deadline\": \"2026-09-21T18:00:00\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get all tasks",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/tasks", "host": [ "{{baseUrl}}" ], "path": [ "api", "tasks" ] }
+          }
+        },
+        {
+          "name": "Get tasks (filter status=NEW)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks?status=NEW",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "tasks" ],
+              "query": [ { "key": "status", "value": "NEW" } ]
+            }
+          }
+        },
+        {
+          "name": "Get task by id",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/tasks/1", "host": [ "{{baseUrl}}" ], "path": [ "api", "tasks", "1" ] }
+          }
+        },
+        {
+          "name": "Update task",
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/tasks/1", "host": [ "{{baseUrl}}" ], "path": [ "api", "tasks", "1" ] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Сдать финальный проект (обновлено)\",\n  \"description\": \"Осталось совсем чуть-чуть\",\n  \"deadline\": \"2026-09-21T20:00:00\",\n  \"status\": \"IN_PROGRESS\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete task",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/tasks/1", "host": [ "{{baseUrl}}" ], "path": [ "api", "tasks", "1" ] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Negative scenarios",
+      "item": [
+        {
+          "name": "Get tasks WITHOUT token (401)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/tasks", "host": [ "{{baseUrl}}" ], "path": [ "api", "tasks" ] }
+          }
+        },
+        {
+          "name": "Get non-existent task (404)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/tasks/999", "host": [ "{{baseUrl}}" ], "path": [ "api", "tasks", "999" ] }
+          }
+        },
+        {
+          "name": "Login wrong password (401)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": [ "{{baseUrl}}" ], "path": [ "api", "auth", "login" ] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"lipin\",\n  \"password\": \"wrong-password\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Register duplicate (409)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/auth/register", "host": [ "{{baseUrl}}" ], "path": [ "api", "auth", "register" ] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"lipin\",\n  \"email\": \"lipin@test.com\",\n  \"password\": \"secret123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Create invalid task (400)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/api/tasks", "host": [ "{{baseUrl}}" ], "path": [ "api", "tasks" ] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"\",\n  \"deadline\": \"2020-01-01T10:00:00\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Monitoring",
+      "item": [
+        {
+          "name": "Actuator health",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/actuator/health", "host": [ "{{baseUrl}}" ], "path": [ "actuator", "health" ] }
+          }
+        },
+        {
+          "name": "Actuator prometheus",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/actuator/prometheus", "host": [ "{{baseUrl}}" ], "path": [ "actuator", "prometheus" ] }
+          }
+        }
+      ]
+    }
+  ]
+}
