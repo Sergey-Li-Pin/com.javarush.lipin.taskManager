@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: taskManager
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/taskmanager
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+server:
+  port: 8080
+
+logging:
+  level:
+    root: INFO
+    com.javarush.lipin.taskmanager: DEBUG
